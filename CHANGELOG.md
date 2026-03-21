@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.0 (2026-03-21)
+
+### Features
+
+- **health**: Implement health check for NetBox API connectivity
+  ([`7aa0329`](https://github.com/SlothCroissant/netbox-prometheus-sd/commit/7aa032969e7b6a5dc92270c4e5930da8d8ff1096))
+
+
 ## v1.0.1 (2026-03-21)
 
 ### Bug Fixes
