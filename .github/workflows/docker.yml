@@ -40,7 +40,7 @@ jobs:
         run: docker build -t netbox-prometheus-sd:${{ github.sha }} .
 
       - name: Trivy (container image scan)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.35.0
         with:
           image-ref: netbox-prometheus-sd:${{ github.sha }}
           format: table
@@ -48,7 +48,7 @@ jobs:
           severity: CRITICAL,HIGH
 
       - name: Trivy (filesystem scan)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.35.0
         with:
           scan-type: fs
           scan-ref: .
