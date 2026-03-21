@@ -1,0 +1,10 @@
+services:
+  netbox-prometheus-sd:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      VERIFY_SSL: "false"
+    env_file:
+      - local.env
+    restart: unless-stopped

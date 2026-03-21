@@ -1,0 +1,23 @@
+{
+  "name": "netbox-prometheus-sd",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "postCreateCommand": "pip install -r requirements.txt",
+  "forwardPorts": [8080],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.analysis.typeCheckingMode": "basic"
+      }
+    }
+  },
+  "runArgs": ["--env-file", "local.env"],
+  "containerEnv": {
+    "VERIFY_SSL": "false"
+  }
+}
