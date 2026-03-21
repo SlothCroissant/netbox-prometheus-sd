@@ -137,7 +137,17 @@ def tcp_targets():
 
 @app.route("/health")
 def health():
-    return jsonify({"status": "ok"})
+    """Ping NetBox API to validate connectivity."""
+    headers = {"Authorization": AUTH_HEADER, "Accept": "application/json"}
+    url = urljoin(NETBOX_URL.rstrip("/") + "/", "api/status/")
+    try:
+        resp = requests.get(url, headers=headers, verify=VERIFY_SSL, timeout=10)
+        resp.raise_for_status()
+        return jsonify({"status": "ok", "netbox": "reachable"}), 200
+    except RequestException as e:
+        detail = str(e)[:200]
+        logger.error("Health check failed: %s", detail)
+        return jsonify({"status": "error", "netbox": "unreachable", "detail": detail}), 503
 
 
 if __name__ == "__main__":
