@@ -11,6 +11,6 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 COPY app.py .
 
-EXPOSE 8080
+EXPOSE 9099
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--timeout", "120", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:9099", "--workers", "2", "--timeout", "120", "app:app"]

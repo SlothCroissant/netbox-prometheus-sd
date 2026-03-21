@@ -57,7 +57,7 @@ The app is configured via environment variables:
      netbox-prometheus-sd:
        image: ghcr.io/slothcroissant/netbox-prometheus-sd:latest
        ports:
-         - "8080:8080"
+         - "9099:9099"
        env_file:
          - .env
        environment:
@@ -75,7 +75,7 @@ The app is configured via environment variables:
 
 ```bash
 docker run -d \
-  -p 8080:8080 \
+  -p 9099:9099 \
   -e NETBOX_URL=https://netbox.example.com \
   -e NETBOX_API_KEY=your_api_key \
   -e NETBOX_API_TOKEN=your_api_token \
@@ -95,7 +95,7 @@ scrape_configs:
     params:
       module: [icmp]
     http_sd_configs:
-      - url: http://netbox-prometheus-sd:8080/icmp
+      - url: http://netbox-prometheus-sd:9099/icmp
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -109,7 +109,7 @@ scrape_configs:
     params:
       module: [dns]
     http_sd_configs:
-      - url: http://netbox-prometheus-sd:8080/dns
+      - url: http://netbox-prometheus-sd:9099/dns
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -123,7 +123,7 @@ scrape_configs:
     params:
       module: [tcp_connect]
     http_sd_configs:
-      - url: http://netbox-prometheus-sd:8080/tcp
+      - url: http://netbox-prometheus-sd:9099/tcp
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target

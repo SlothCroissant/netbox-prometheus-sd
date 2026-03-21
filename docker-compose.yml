@@ -2,7 +2,7 @@ services:
   netbox-prometheus-sd:
     build: .
     ports:
-      - "8080:8080"
+      - "9099:9099"
     environment:
       VERIFY_SSL: "false"
     env_file:
