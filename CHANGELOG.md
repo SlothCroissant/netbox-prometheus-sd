@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.3.0 (2026-04-13)
+
+### Documentation
+
+- Add VERIFY_SSL default to TRUE
+  ([`479ec00`](https://github.com/SlothCroissant/netbox-prometheus-sd/commit/479ec00419f0221ab9dc326e7cf3c25726053c41))
+
+### Features
+
+- Expanded logging to include API reqs to Netbox
+  ([`9e670c4`](https://github.com/SlothCroissant/netbox-prometheus-sd/commit/9e670c48153f4301a68b6c70cce9adc4d2b7a2b6))
+
+
 ## v1.2.0 (2026-04-13)
 
 ### Features
