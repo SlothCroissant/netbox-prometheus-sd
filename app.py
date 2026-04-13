@@ -55,9 +55,21 @@ def handle_netbox_error(e):
     return jsonify({"error": "NetBox API request failed", "detail": detail}), status
 
 
+def _netbox_request(method, url, params=None, timeout=30):
+    """Make an authenticated request to NetBox with request/response logging."""
+    headers = {"Authorization": AUTH_HEADER, "Accept": "application/json"}
+    logger.info("NetBox API request: %s %s params=%s", method.upper(), url, params)
+    resp = requests.request(method, url, headers=headers, params=params, verify=VERIFY_SSL, timeout=timeout)
+    logger.info(
+        "NetBox API response: %s %s -> %d (%d bytes)",
+        method.upper(), url, resp.status_code, len(resp.content),
+    )
+    logger.debug("NetBox API response body: %.2000s", resp.text)
+    return resp
+
+
 def fetch_all_ip_addresses():
     """Fetch all IP addresses from NetBox, handling pagination."""
-    headers = {"Authorization": AUTH_HEADER, "Accept": "application/json"}
     url = urljoin(NETBOX_URL.rstrip("/") + "/", "api/ipam/ip-addresses/")
     results = []
     params = {"limit": 1000}
@@ -65,9 +77,7 @@ def fetch_all_ip_addresses():
 
     logger.info("Fetching all IP addresses from NetBox")
     while url:
-        logger.debug("Fetching IP addresses page %d: %s", page, url)
-        resp = requests.get(url, headers=headers, params=params, verify=VERIFY_SSL, timeout=30)
-        logger.debug("IP addresses page %d response: %s", page, resp.status_code)
+        resp = _netbox_request("GET", url, params=params)
         resp.raise_for_status()
         data = resp.json()
         page_results = data.get("results", [])
@@ -191,7 +201,6 @@ def tcp_targets():
 
 def fetch_devices(params=None):
     """Fetch devices from NetBox, handling pagination."""
-    headers = {"Authorization": AUTH_HEADER, "Accept": "application/json"}
     url = urljoin(NETBOX_URL.rstrip("/") + "/", "api/dcim/devices/")
     results = []
     query_params = {"limit": 1000}
@@ -201,9 +210,7 @@ def fetch_devices(params=None):
 
     logger.info("Fetching devices from NetBox (filters: %s)", params)
     while url:
-        logger.debug("Fetching devices page %d: %s (params: %s)", page, url, query_params)
-        resp = requests.get(url, headers=headers, params=query_params, verify=VERIFY_SSL, timeout=30)
-        logger.debug("Devices page %d response: %s", page, resp.status_code)
+        resp = _netbox_request("GET", url, params=query_params)
         resp.raise_for_status()
         data = resp.json()
         page_results = data.get("results", [])
@@ -219,7 +226,6 @@ def fetch_devices(params=None):
 
 def fetch_device_type_ids(manufacturer=None, model=None):
     """Search device types by manufacturer and/or model keyword, return matching IDs."""
-    headers = {"Authorization": AUTH_HEADER, "Accept": "application/json"}
     url = urljoin(NETBOX_URL.rstrip("/") + "/", "api/dcim/device-types/")
     params = {"limit": 1000}
     if manufacturer:
@@ -231,9 +237,7 @@ def fetch_device_type_ids(manufacturer=None, model=None):
     logger.info("Fetching device type IDs (manufacturer=%s, model=%s)", manufacturer, model)
     results = []
     while url:
-        logger.debug("Fetching device types page %d: %s", page, url)
-        resp = requests.get(url, headers=headers, params=params, verify=VERIFY_SSL, timeout=30)
-        logger.debug("Device types page %d response: %s", page, resp.status_code)
+        resp = _netbox_request("GET", url, params=params)
         resp.raise_for_status()
         data = resp.json()
         page_results = data.get("results", [])
@@ -330,12 +334,9 @@ def device_targets():
 def health():
     """Ping NetBox API to validate connectivity."""
     logger.info("Processing /health request")
-    headers = {"Authorization": AUTH_HEADER, "Accept": "application/json"}
     url = urljoin(NETBOX_URL.rstrip("/") + "/", "api/status/")
     try:
-        logger.debug("Health check: GET %s", url)
-        resp = requests.get(url, headers=headers, verify=VERIFY_SSL, timeout=10)
-        logger.debug("Health check response: %s", resp.status_code)
+        resp = _netbox_request("GET", url, timeout=10)
         resp.raise_for_status()
         logger.info("Health check passed: NetBox reachable")
         return jsonify({"status": "ok", "netbox": "reachable"}), 200
