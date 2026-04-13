@@ -252,18 +252,45 @@ def fetch_device_type_ids(manufacturer=None, model=None):
     return ids
 
 
+def filter_virtual_chassis(devices):
+    """Deduplicate virtual chassis members, keeping only the master device."""
+    filtered = []
+    skipped = 0
+    for device in devices:
+        vc = device.get("virtual_chassis")
+        if vc:
+            master = vc.get("master")
+            if master and master.get("id") != device.get("id"):
+                logger.debug(
+                    "Skipping VC member %s (id=%s), master is %s (id=%s)",
+                    device.get("name"), device.get("id"),
+                    master.get("display"), master.get("id"),
+                )
+                skipped += 1
+                continue
+        filtered.append(device)
+    if skipped:
+        logger.info("Filtered out %d virtual chassis member(s)", skipped)
+    return filtered
+
+
 def build_device_labels(device):
     """Build Prometheus labels from a NetBox device entry."""
+    # Use virtual chassis name when device is a VC master
+    vc = device.get("virtual_chassis")
+    vc_name = vc.get("name") if vc else None
+    display_name = vc_name or device.get("name", "")
+
     primary_ip = device.get("primary_ip") or device.get("primary_ip4") or device.get("primary_ip6")
-    address = primary_ip["address"].split("/")[0] if primary_ip else device.get("name", "")
+    address = primary_ip["address"].split("/")[0] if primary_ip else display_name
     if not primary_ip:
-        logger.warning("Device %s (id=%s) has no primary IP, using name as address", device.get("name"), device.get("id"))
+        logger.warning("Device %s (id=%s) has no primary IP, using name as address", display_name, device.get("id"))
 
     labels = {"__address__": address}
-    logger.debug("Building labels for device %s (id=%s, address=%s)", device.get("name"), device.get("id"), address)
+    logger.debug("Building labels for device %s (id=%s, address=%s)", display_name, device.get("id"), address)
 
-    if device.get("name"):
-        labels["device"] = device["name"]
+    if display_name:
+        labels["device"] = display_name
 
     dt = device.get("device_type") or {}
     if dt.get("model"):
@@ -320,6 +347,7 @@ def device_targets():
         params["device_type_id"] = dt_ids
 
     devices = fetch_devices(params)
+    devices = filter_virtual_chassis(devices)
     targets = []
 
     for device in devices:
