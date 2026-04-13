@@ -4,7 +4,8 @@ services:
     ports:
       - "9099:9099"
     environment:
-      VERIFY_SSL: "false"
+      VERIFY_SSL: "true"
+      LOG_LEVEL: "DEBUG"
     env_file:
       - local.env
     restart: unless-stopped
