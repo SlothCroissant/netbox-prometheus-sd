@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.2.0 (2026-04-13)
+
+### Features
+
+- Added devices endpoint, logging, updated requests package
+  ([`2c2232d`](https://github.com/SlothCroissant/netbox-prometheus-sd/commit/2c2232dde56eae80473e214c21e8df5598791d60))
+
+
 ## v1.1.0 (2026-03-21)
 
 ### Features
