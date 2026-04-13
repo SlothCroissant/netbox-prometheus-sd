@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.4.0 (2026-04-13)
+
+### Continuous Integration
+
+- Update action-gh-release to v3 in Docker workflow
+  ([`a6c6e74`](https://github.com/SlothCroissant/netbox-prometheus-sd/commit/a6c6e74764cb34ad29971df78ba1f1346fed15e4))
+
+### Features
+
+- Add virtual chassis filtering to device retrieval
+  ([`2cf2038`](https://github.com/SlothCroissant/netbox-prometheus-sd/commit/2cf2038ced13a21ece74b74521451b725f67518b))
+
+
 ## v1.3.0 (2026-04-13)
 
 ### Documentation
